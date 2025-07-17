@@ -1,4 +1,5 @@
-import { sql } from "../../../db";
+import { sql } from "../auth-handler/db";
+
 
 async function handler({ action }) {
   switch (action) {
