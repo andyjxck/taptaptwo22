@@ -1,21 +1,21 @@
+import { sql } from "../../../db"; // Adjust path if needed
+
 async function handler({ action }) {
   try {
     switch (action) {
       case "getMetrics": {
-        // Get total pageviews
+        // Your database code here (unchanged)
         const totalResult = await sql`
           SELECT COUNT(*) as total FROM pageviews
         `;
         const totalPageviews = totalResult[0].total;
 
-        // Get unique visitors (counting null/anonymous as one visitor)
         const uniqueResult = await sql`
           SELECT COUNT(DISTINCT COALESCE(user_id, 0)) as unique_visitors 
           FROM pageviews
         `;
         const uniqueVisitors = uniqueResult[0].unique_visitors;
 
-        // Get popular pages with proper path formatting
         const popularPages = await sql`
           SELECT page_path as path, COUNT(*) as views 
           FROM pageviews 
@@ -24,7 +24,6 @@ async function handler({ action }) {
           LIMIT 5
         `;
 
-        // Get recent visits
         const recentVisits = await sql`
           SELECT 
             timestamp, 
@@ -54,6 +53,11 @@ async function handler({ action }) {
     return { error: "Failed to get analytics" };
   }
 }
+
 export async function POST(request) {
-  return handler(await request.json());
+  const result = await handler(await request.json());
+  return new Response(JSON.stringify(result), {
+    headers: { "Content-Type": "application/json" },
+    status: 200,
+  });
 }
